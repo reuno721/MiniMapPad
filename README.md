@@ -1,5 +1,9 @@
 # MiniMapPad — Code Map Generator (Auto Copy)
 
+<p align="center">
+  <img src="assets/screenshot.png" alt="MiniMapPad screenshot" width="920">
+</p>
+
 Generate a compact **structure map** from long source code, then **auto-copy** it to your clipboard for ChatGPT / Claude / Gemini.
 
 **Primary:** Python (AST) / PHP (lite)  
