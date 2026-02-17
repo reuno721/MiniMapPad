@@ -1,62 +1,102 @@
 # MiniMapPad — Code Map Generator (Auto Copy)
 
-Turn long source code into a **compact structure map** you can paste into ChatGPT / Claude / Gemini.
-Designed for people who don’t want to manually trim code every time.
+Generate a compact **structure map** from long source code, then **auto-copy** it to your clipboard for ChatGPT / Claude / Gemini.
 
-✅ **Primary support:** Python (AST) / PHP (lite)  
-🟡 **Secondary:** Kotlin / Java (lite)  
-📋 **Workflow:** Paste → Generate → Auto-copy → Paste to LLM
+**Primary:** Python (AST) / PHP (lite)  
+**Secondary:** Kotlin / Java (lite)  
+**Workflow:** Paste → Generate → Auto-copy → Paste to LLM
 
 ---
 
-## Why MiniMapPad?
+## What is a “Code Map”?
 
-LLMs often get confused when you paste a huge file (1,000–5,000+ lines).  
-MiniMapPad generates a **read-only “Code Map”**:
+When you paste a huge file (1,000–5,000+ lines) into an LLM, it may hallucinate or miss important context.
+
+MiniMapPad outputs a **read-only structure map**, such as:
 
 - imports / namespace / use
-- constants / defines (PHP)
+- constants / defines
 - functions + line numbers
 - classes + methods + line numbers
-- small call hints (PHP: `->` / `::`)
-- optional TODO warnings
+- (lite) a few call hints (e.g., `->`, `::`)
+- optional TODO/FIXME/HACK/TEMP warnings
 
-This helps the model ask for **only the needed function blocks** instead of guessing.
-
----
-
-## Output Example
-
-MiniMapPad outputs something like:
-
-- `class MainActivity [L191]`
-- `fun onCreate(savedInstanceState: Bundle?) [L197]`
-- `function foo($a, $b) [L120]`
-- `class Foo::bar($x) [L88]`
-
-> Rule: The map is structure-only. Do NOT rewrite code.
+**Rule:** This is a structure map. Do **NOT** rewrite code.  
+**Rule:** Ask for a specific function/class block when needed.
 
 ---
 
 ## Features
 
-- **Python AST map (accurate)**
-- **PHP lite map (regex/token scan)** — low overhead, practical
-- **Kotlin/Java lite mode** — never blocks your flow
-- **Auto mode**
+- ✅ **Python AST mode** (accurate structure extraction)
+- ✅ **PHP lite mode** (regex/token scanning, practical + low overhead)
+- ✅ **Kotlin / Java lite mode** (line scan; should not block your workflow)
+- ✅ **Auto mode**
   - Try Python AST first
-  - If parse fails, silently fallback to lite mode
-- **Auto-copy to clipboard**
-- Optional **secret/PII redaction**
-- Optional **TODO/FIXME/HACK/TEMP** warnings
-- Dark mode UI
+  - If parsing fails, fallback to a lite mode
+- ✅ **Auto-copy to clipboard**
+- ✅ Optional **redaction** (secrets / basic PII patterns)
+- ✅ Optional **TODO warnings**
+- ✅ Dark mode UI
 
 ---
 
 ## Quick Start
 
 ### Option A) Run from Python
-Requirements: Python 3.9+
+Requirements: **Python 3.9+**
 
 ```bash
 python minimappad_v2_2.py
+```
+
+### Option B) Windows EXE
+Download from **Releases** and run it.
+
+---
+
+## How to Use
+
+1. Paste code into **Step1**
+2. Click **Generate Map**
+3. Output appears in **Step2** and is **auto-copied**
+4. Paste into your LLM (Ctrl+V)
+
+Suggested prompt for your LLM:
+
+> Here is a read-only code map. Do NOT rewrite code.  
+> Ask me which specific function/class block you need, then I will paste it.
+
+---
+
+## Language Support
+
+- **Python (AST):** best accuracy
+- **PHP (lite):** extracts `namespace`, `use`, `define/const`, `function`, `class`, `method`, plus small call hints (`->` / `::`)
+- **Kotlin / Java (lite):** imports, declarations, fun/method signatures (best-effort)
+
+If you paste non-Python code in Auto mode, Python parsing may fail and the tool will use a lite mode.
+
+---
+
+## Redaction (Optional)
+
+When enabled, MiniMapPad will redact:
+- emails
+- KR phone number patterns
+- KR SSN-like patterns
+- common secret assignments (TOKEN / API KEY / SECRET / PASSWORD / etc.)
+
+This is a best-effort safety layer, not a perfect sanitizer.
+
+---
+
+## Privacy
+
+MiniMapPad runs locally. It does not send data anywhere.
+
+---
+
+## License
+
+MIT
