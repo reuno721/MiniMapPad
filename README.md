@@ -4,7 +4,7 @@
   <img src="assets/screenshot.jpg" alt="MiniMapPad screenshot" width="920">
 </p>
 
-Generate a compact **structure map** from long source code, then **auto-copy** it to your clipboard for ChatGPT / Gemini etc.
+Generate a compact **structure map** from long source code, then **auto-copy** it to your clipboard for ChatGPT / Claude / Gemini etc.
 
 **Primary:** Python (AST) / PHP (lite)  
 **Secondary:** Kotlin / Java (lite)  
@@ -34,12 +34,12 @@ MiniMapPad outputs a **read-only structure map**, such as:
 
 Pasting large files into an LLM causes two problems: hallucinations increase toward the end of context, and token usage spikes fast. MiniMapPad sends the structure first — then you paste only the specific block the LLM needs.
 
-Real-world Reduction examples (results vary by code structure):
+Real-world reduction examples *(results vary by code structure)*:
 
 | Language | Original | Code Map | Reduction |
-|----------|----------|----------|-------------|
-| Kotlin (lite) | 1,850 lines | 118 lines | ~94% |
-| Python (AST) | 500 lines | 50 lines | ~90% |
+|----------|----------|----------|-----------|
+| Kotlin (lite) | 1,850 lines | ~118 lines | ~94% |
+| Python (AST) | 500 lines | ~50 lines | ~90% |
 
 > Results vary by file structure (import-heavy files often compress well).
 
@@ -47,14 +47,20 @@ Real-world Reduction examples (results vary by code structure):
 
 ## Features
 
-- ✅ **Python AST mode** — built on Python's standard ast module (not regex), extracts accurate structure.
-- ✅ **PHP lite mode** — regex/token scanning, practical + low overhead
-- ✅ **Kotlin / Java lite mode** — line scan; imports, declarations, fun/method signatures
+- ✅ **Python AST mode** — built on Python's standard `ast` module (not regex). Accurate structure extraction including `async def` functions/methods, private markers, and return types.
+- ✅ **PHP lite mode** — regex/token scanning. Extracts `namespace`, `use`, `define/const`, class hierarchy (`extends` / `implements`), method visibility (`pub/pro/pri`), `static` / `abstract`, return type hints, and global functions correctly separated from class methods.
+- ✅ **Kotlin lite mode** — Compose-aware. In addition to imports, declarations, and fun signatures, also extracts:
+  - State vars (`by remember` / `rememberSaveable`)
+  - `LaunchedEffect` / `DisposableEffect` blocks
+  - Local functions inside Composables
+  - UI overlay guards (`if (showXxx)`, `resetXxxIndex?.let { }`)
+  - `@Composable` functions correctly classified as top-level regardless of indentation
+- ✅ **Java lite mode** — imports, declarations, method signatures
 - ✅ **Auto mode**
   - Try Python AST first
   - If parsing fails, fall back to a lite mode (no popup, silent)
-  - The selected mode is shown in the output header (e.g., "Mode: Kotlin-lite").
-- ✅ **Auto-copy to clipboard**
+  - The selected mode is shown in the output header (e.g., `Mode: Kotlin-lite (Compose-aware)`)
+- ✅ **Auto-copy** to clipboard
 - ✅ Optional **redaction** (secrets / basic PII patterns)
 - ✅ Optional **TODO warnings**
 - ✅ Dark mode UI
@@ -68,7 +74,7 @@ Real-world Reduction examples (results vary by code structure):
 Requirements: **Python 3.9+**
 
 ```bash
-python minimappad_v2_2.py
+python minimappad_v2_4.py
 ```
 
 ### Option B) Windows EXE
@@ -79,10 +85,10 @@ Download from **Releases** and run it. (No Python required)
 
 ## How to Use
 
-1. Paste code into **Step1**
+1. Paste code into **Step 1**
 2. Click **Generate Map**
-3. Output appears in **Step2** and is **auto-copied**
-4. Paste into your LLM (Ctrl+V)
+3. Output appears in **Step 2** and is **auto-copied**
+4. Paste into your LLM (`Ctrl+V`)
 
 Suggested prompt for your LLM:
 
@@ -93,22 +99,25 @@ Suggested prompt for your LLM:
 
 ## Language Support
 
-- **Python (AST):** best accuracy — and basic call hints (best-effort).
-- **PHP (lite):** extracts `namespace`, `use`, `define/const`, `function`, `class`, `method`, plus small call hints (`->` / `::`)
-- **Kotlin / Java (lite):** imports, declarations, fun/method signatures (best-effort)
+| Language | Mode | Key outputs |
+|----------|------|-------------|
+| Python | AST | imports, constants, classes+methods, functions, `async` tags, private markers |
+| PHP | lite | namespace, use, constants, class hierarchy, method visibility / static / abstract / return type, global functions |
+| Kotlin | lite (Compose-aware) | package, declarations, top-level funs, state vars, effect blocks, local funs, UI overlay guards |
+| Java | lite | package, imports, declarations, method signatures |
 
-If you paste non-Python code in Auto mode, Python parsing may fail and the tool will use a lite mode.
+In Auto mode, if Python AST parsing fails the tool silently falls back to the best-matching lite mode.
 
 ---
 
-## Redaction (Optional)
+## Redaction *(Optional)*
 
 When enabled, MiniMapPad will redact:
 
 - emails
 - KR phone number patterns
 - KR SSN-like patterns
-- common secret assignments (TOKEN / API KEY / SECRET / PASSWORD / etc.)
+- common secret assignments (`TOKEN` / `API_KEY` / `SECRET` / `PASSWORD` / etc.)
 
 This is a best-effort safety layer, not a perfect sanitizer.
 
