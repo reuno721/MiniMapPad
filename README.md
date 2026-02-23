@@ -54,7 +54,7 @@ Real-world reduction examples *(results vary by code structure)*:
   - `LaunchedEffect` / `DisposableEffect` blocks
   - Local functions inside Composables
   - UI overlay guards (`if (showXxx)`, `resetXxxIndex?.let { }`)
-  - `@Composable` functions correctly classified as top-level regardless of indentation
+  - `@Composable` functions are detected and highlighted (best-effort)
 - ✅ **Java lite mode** — imports, declarations, method signatures
 - ✅ **Auto mode**
   - Try Python AST first
